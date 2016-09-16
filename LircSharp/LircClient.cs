@@ -41,6 +41,7 @@ namespace LircSharp
 
         public void Dispose()
         {
+            if (!Disposed) return;
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -48,6 +49,7 @@ namespace LircSharp
         protected virtual void Dispose(bool disposing)
         {
             Disposed = true;
+            Logger.Debug("Dispose");
         }
 
         public void Connect()

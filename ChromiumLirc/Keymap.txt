@@ -1,0 +1,3 @@
+﻿KEY_UP=up
+KEY_DOWN=down
+KEY_EXIT=ctrl+shift+q
