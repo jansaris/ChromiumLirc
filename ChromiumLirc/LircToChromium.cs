@@ -15,7 +15,7 @@ namespace ChromiumLirc
         readonly SendKeys _keySender;
         readonly Dictionary<string,string> _dictionary = new Dictionary<string, string>();
 
-        string ChromiumAliveString => _chromium.IsAlive ? string.Empty : "not ";
+        string ChromiumAliveString => _chromium.IsAlive ? string.Empty : " not";
         bool _disposed;
 
         public LircToChromium(LircClient lirc, Chromium chromium, SendKeys keySender, string keymap)

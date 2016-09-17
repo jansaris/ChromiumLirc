@@ -126,7 +126,6 @@ namespace LircSharp
         {
             try
             {
-                Logger.Debug($"Parse {count - index} bytes");
                 _parser.Parse(buffer, index, count);
             }
             catch (LircParsingException e)

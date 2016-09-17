@@ -17,10 +17,10 @@ namespace ChromiumLirc
         bool _disposed;
 
         public int ActivePid => _monitoredProcess?.Id ?? -1;
-        public string ActiveProcessName => _monitoredProcess?.ProcessName ?? "";
+        string ActiveProcessName => _monitoredProcess?.ProcessName ?? "";
         public bool IsAlive => !_monitoredProcess?.HasExited ?? false;
 
-        Process _monitoredProcess = null;
+        Process _monitoredProcess;
 
         public Chromium(string processName)
         {
@@ -83,6 +83,7 @@ namespace ChromiumLirc
                     _monitoredProcess = null;
                 }
                 Logger.Debug($"Process {ActivePid}: {ActiveProcessName} is still running, poll after {PollTime}ms");
+                Thread.Sleep(PollTime);
             }
         }
 

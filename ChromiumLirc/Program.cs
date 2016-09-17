@@ -1,9 +1,11 @@
 ﻿using System;
 using NLog;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using LircSharp;
+using SharedComponents.Helpers;
 
 namespace ChromiumLirc
 {
@@ -21,7 +23,7 @@ namespace ChromiumLirc
         {
             try
             {
-                Logger.Info("Welcome to ChromiumLirc");
+                Logger.Info($"Welcome to ChromiumLirc ({Process.GetCurrentProcess().Id})");
                 Directory.SetCurrentDirectory(AssemblyDirectory);
                 var program = new Program();
                 program.ReadConfiguration();
@@ -30,6 +32,7 @@ namespace ChromiumLirc
             catch (Exception ex)
             {
                 Logger.Fatal(ex, $"An unhandled exception occured: {ex.Message}");
+                Logger.Fatal(ex.StackTrace);
             }
         }
 
@@ -41,16 +44,27 @@ namespace ChromiumLirc
             var chromium = new Chromium(_processName);
             var sendKeys = new SendKeys(_xdoTool);
             var connect = new LircToChromium(lirc,chromium, sendKeys, _keymap);
+            var signal = new LinuxSignal();
 
             try
             {
                 //Start threads
+                signal.Listen();
                 if (string.IsNullOrWhiteSpace(_unixEndpoint)) lirc.Connect(_host, _port);
                 else lirc.Connect(_unixEndpoint);
                 chromium.Watch();
                 connect.Run();
-                Logger.Info("Wait for 'Enter' to exit");
-                Console.ReadLine();
+                if (Console.IsInputRedirected)
+                {
+                    Logger.Info("Wait for kill-signal");
+                    signal.WaitForListenThreadToComplete();
+                }
+                else
+                {
+                    Logger.Info("Wait for keyboard input");
+                    Console.WriteLine("Press enter to exit");
+                    Console.ReadLine();
+                }
             }
             finally
             {
@@ -59,6 +73,7 @@ namespace ChromiumLirc
                 chromium.Dispose();
                 sendKeys.Dispose();
                 connect.Dispose();
+                signal.Dispose();
             }
         }
 
