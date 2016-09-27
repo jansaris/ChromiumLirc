@@ -9,6 +9,8 @@ namespace ChromiumLirc
     public class Chromium : IDisposable
     {
         static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        readonly static object SyncRoot = new object();
+
         const int AbortTimeout = 1100;
         const int PollTime = 1000;
 
@@ -16,9 +18,17 @@ namespace ChromiumLirc
         Thread _thread;
         bool _disposed;
 
-        public int ActivePid => _monitoredProcess?.Id ?? -1;
-        string ActiveProcessName => _monitoredProcess?.ProcessName ?? "";
-        public bool IsAlive => !_monitoredProcess?.HasExited ?? false;
+        public int ActivePid => GetProcess()?.Id ?? -1;
+        string ActiveProcessName => GetProcess()?.ProcessName ?? "";
+        public bool IsAlive => !GetProcess()?.HasExited ?? false;
+
+        Process GetProcess()
+        {
+            lock (SyncRoot)
+            {
+                return _monitoredProcess;
+            }
+        }
 
         Process _monitoredProcess;
 
@@ -62,13 +72,16 @@ namespace ChromiumLirc
                 }
                 Logger.Debug($"Found {list.Length} processes for {_processName}");
                 Array.ForEach(list, process => Logger.Debug($"{process.Id}: {process.ProcessName}"));
-                _monitoredProcess = list.FirstOrDefault(p => !p.HasExited);
-                if (_monitoredProcess == null)
+                lock (SyncRoot)
+                {
+                    _monitoredProcess = list.FirstOrDefault(p => !p.HasExited);
+                }
+                if (GetProcess() == null)
                 {
                     Logger.Debug("None of these processes was alive");
                     continue;
                 }
-                Logger.Info($"Start monitoring {_monitoredProcess.Id}: {_monitoredProcess.ProcessName}");
+                Logger.Info($"Start monitoring {GetProcess().Id}: {GetProcess().ProcessName}");
                 MonitorInstance();
             }
         }
@@ -77,10 +90,13 @@ namespace ChromiumLirc
         {
             while (!_disposed && IsAlive)
             {
-                if (_monitoredProcess?.WaitForExit(PollTime) ?? true)
+                if (GetProcess()?.WaitForExit(PollTime) ?? true)
                 {
                     Logger.Info($"Process {ActivePid}: {ActiveProcessName} has exited");
-                    _monitoredProcess = null;
+                    lock (SyncRoot)
+                    {
+                        _monitoredProcess = null;
+                    }
                 }
                 Logger.Debug($"Process {ActivePid}: {ActiveProcessName} is still running, poll after {PollTime}ms");
                 Thread.Sleep(PollTime);

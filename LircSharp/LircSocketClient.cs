@@ -72,7 +72,7 @@ namespace LircSharp
         void SetupReadWriteThreads()
         {
             Logger.Debug("SetupReadWriteThreads");
-            ThreadPool.QueueUserWorkItem(DoRead, null);
+            ThreadPool.QueueUserWorkItem(DoReadSafe, null);
             ThreadPool.QueueUserWorkItem(DoWrite, null);
         }
 
@@ -198,6 +198,18 @@ namespace LircSharp
             }
         }
 
+        void DoReadSafe(object state)
+        {
+            try
+            {
+                DoRead(state);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Connection with Lirc lost: {ex.Message}");
+            }
+        }
+
         void DoRead(object state)
         {
             // If we're not connected, wait until we are
@@ -221,7 +233,7 @@ namespace LircSharp
                 if (_socket == null || !_socket.Connected)
                 {
                     // We got disconnected somehow, just queue up a read
-                    ThreadPool.QueueUserWorkItem(DoRead, state);
+                    ThreadPool.QueueUserWorkItem(DoReadSafe, state);
                     return;
                 }
 
@@ -235,7 +247,7 @@ namespace LircSharp
             {
                 OnError("Exception reading.", e);
                 // There was an error starting up the read, so let's queue up another
-                ThreadPool.QueueUserWorkItem(DoRead, state);
+                ThreadPool.QueueUserWorkItem(DoReadSafe, state);
             }
         }
 
@@ -270,7 +282,7 @@ namespace LircSharp
             }
 
             // Then kick of another read
-            ThreadPool.QueueUserWorkItem(DoRead, e.UserToken);
+            ThreadPool.QueueUserWorkItem(DoReadSafe, e.UserToken);
         }
 
         void DoWrite(object state)

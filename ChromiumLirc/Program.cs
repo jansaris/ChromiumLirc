@@ -38,7 +38,7 @@ namespace ChromiumLirc
 
         void Run()
         {
-            Logger.Info($"Start listening to Lirc on {_host}:{_port}");
+            Logger.Info("Start listening to Lirc");
             //Initialize
             var lirc = new LircSocketClient();
             var chromium = new Chromium(_processName);

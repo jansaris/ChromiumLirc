@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using LircSharp;
 using NLog;
 
@@ -60,21 +61,43 @@ namespace ChromiumLirc
 
         void Lirc_KeyPressed(object sender, LircKeyPressEventArs e)
         {
-            Logger.Info($"Lirc key pressed: {e.Key} - Chromium is{ChromiumAliveString} alive");
-            if (_chromium.IsAlive && _dictionary.ContainsKey(e.Key))
+            Safe(() =>
             {
-                _keySender.SendKey(_dictionary[e.Key], _chromium.ActivePid);
-            }
+                Logger.Info($"Lirc key pressed: {e.Key} - Chromium is{ChromiumAliveString} alive");
+                if (_chromium.IsAlive && _dictionary.ContainsKey(e.Key))
+                {
+                    _keySender.SendKey(_dictionary[e.Key], _chromium.ActivePid);
+                }
+            });
         }
 
         void Lirc_Error(object sender, LircErrorEventArgs e)
         {
-            Logger.Warn($"Lirc error: {e.Message} - Chromium is{ChromiumAliveString} alive");
+            Safe(() =>
+            {
+                Logger.Warn($"Lirc error: {e.Message} - Chromium is{ChromiumAliveString} alive");
+            });
+            
         }
 
         void Lirc_Connected(object sender, EventArgs e)
         {
-            Logger.Info($"Connected to Lirc - Chromium is{ChromiumAliveString} alive");
+            Safe(() =>
+            {
+                Logger.Info($"Connected to Lirc - Chromium is{ChromiumAliveString} alive");
+            });
+        }
+
+        void Safe(Action actionToPerform, [CallerMemberName] string caller = null)
+        {
+            try
+            {
+                actionToPerform();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to handle: {caller} because: {ex.Message}");
+            }
         }
 
         public void Dispose()
