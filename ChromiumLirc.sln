@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChromiumLirc", "ChromiumLir
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LircSharp", "LircSharp\LircSharp.csproj", "{A18073C3-090B-4DB0-8DE5-4F1CC0B0E36B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lirc2Chromium", "Lirc2Chromium\Lirc2Chromium.csproj", "{708D11DA-EEB9-4D49-B099-1507D146904E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A18073C3-090B-4DB0-8DE5-4F1CC0B0E36B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A18073C3-090B-4DB0-8DE5-4F1CC0B0E36B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A18073C3-090B-4DB0-8DE5-4F1CC0B0E36B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{708D11DA-EEB9-4D49-B099-1507D146904E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{708D11DA-EEB9-4D49-B099-1507D146904E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{708D11DA-EEB9-4D49-B099-1507D146904E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{708D11DA-EEB9-4D49-B099-1507D146904E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

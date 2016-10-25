@@ -1,0 +1,11 @@
+﻿KEY_OK=space
+KEY_PLAY=space
+KEY_PAUSE=space
+KEY_UP=Up
+KEY_DOWN=Down
+KEY_LEFT=Left
+KEY_RIGHT=Right
+KEY_EXIT=ctrl+shift+q
+KEY_STOP=ctrl+shift+q
+KEY_INFO=question
+KEY_DVD=ctrl+alt+shift+d
