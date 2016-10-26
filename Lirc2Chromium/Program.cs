@@ -6,9 +6,9 @@ namespace Lirc2Chromium
 {
     class Program
     {
-        private readonly LircClient _lirc;
-        private readonly Chromium _chromium;
-        private readonly LinuxSignal _signal;
+        readonly LircClient _lirc;
+        readonly Chromium _chromium;
+        readonly LinuxSignal _signal;
         readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         public Program(LircClient lirc, Chromium chromium, LinuxSignal signal)
@@ -32,13 +32,13 @@ namespace Lirc2Chromium
             }
         }
 
-        private void Run()
+        void Run()
         {
             _logger.Info("Welcome to Lirc2Chromium");
             try
             {
                 _signal.Listen();
-                _lirc.KeyPressed += _chromium.SendKey;
+                _lirc.KeyAction += _chromium.SendKey;
                 _lirc.Listen();
 
                 if (Console.IsInputRedirected)
@@ -51,6 +51,7 @@ namespace Lirc2Chromium
                     _logger.Info("Wait for keyboard input");
                     Console.WriteLine("Press enter to exit");
                     Console.ReadLine();
+                    _logger.Info("Received stop event, close application");
                 }
             }
             catch (Exception ex)
